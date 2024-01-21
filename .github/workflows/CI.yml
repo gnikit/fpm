@@ -183,7 +183,7 @@ jobs:
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ env.FPM_RELEASE }}-${{ matrix.os-arch }}
+        name: ${{ env.FPM_RELEASE }}-${{ matrix.os-arch }}-gcc-${{ matrix.gcc_v }}
         path: ${{ env.FPM_RELEASE }}
 
 
