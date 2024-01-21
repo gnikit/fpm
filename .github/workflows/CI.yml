@@ -230,6 +230,12 @@ jobs:
     - name: Fetch Windows executable
       shell: msys2 {0}
       run: |
+        ls -l fpm-*
+        echo "================================================================="
+        ls -l fpm-*/fpm*
+        echo "================================================================="
+        tree .
+        echo "================================================================="
         cp fpm-*/fpm*.exe ./ci/fpm.exe
 
     - name: Fetch Git for Windows
