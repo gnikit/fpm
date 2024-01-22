@@ -203,7 +203,7 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         path: ${{ github.workspace }}
-        merge-multiple: true
+        # merge-multiple: true
 
     - name: Get version (normal)
       if: github.event_name != 'release'
@@ -294,7 +294,7 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         path: ${{ github.workspace }}
-        merge-multiple: true
+        # merge-multiple: true
 
     - name: Normalize file names for continuous delivery
       if: ${{ github.event_name == 'push' }}
