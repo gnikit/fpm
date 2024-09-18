@@ -309,8 +309,7 @@ subroutine get_release_compile_flags(id, flags)
             flag_intel_limit//&
             flag_intel_pthread//&
             flag_intel_nogen//&
-            flag_intel_byterecl//&
-            flag_intel_standard_compliance
+            flag_intel_byterecl
 
     case(id_intel_classic_mac)
         flags = &
@@ -320,8 +319,7 @@ subroutine get_release_compile_flags(id, flags)
             flag_intel_limit//&
             flag_intel_pthread//&
             flag_intel_nogen//&
-            flag_intel_byterecl//&
-            flag_intel_standard_compliance
+            flag_intel_byterecl
 
     case(id_intel_classic_windows)
         flags = &
@@ -331,8 +329,7 @@ subroutine get_release_compile_flags(id, flags)
             flag_intel_limit_win//&
             flag_intel_pthread_win//&
             flag_intel_nogen_win//&
-            flag_intel_byterecl_win//&
-            flag_intel_standard_compliance_win
+            flag_intel_byterecl_win
 
     case(id_intel_llvm_nix)
         flags = &
@@ -342,8 +339,7 @@ subroutine get_release_compile_flags(id, flags)
             flag_intel_limit//&
             flag_intel_pthread//&
             flag_intel_nogen//&
-            flag_intel_byterecl//&
-            flag_intel_standard_compliance
+            flag_intel_byterecl
 
     case(id_intel_llvm_windows)
         flags = &
@@ -353,8 +349,7 @@ subroutine get_release_compile_flags(id, flags)
             flag_intel_limit_win//&
             flag_intel_pthread_win//&
             flag_intel_nogen_win//&
-            flag_intel_byterecl_win//&
-            flag_intel_standard_compliance_win
+            flag_intel_byterecl_win
 
     case(id_nag)
         flags = &
@@ -418,7 +413,6 @@ subroutine get_debug_compile_flags(id, flags)
             flag_intel_limit//&
             flag_intel_debug//&
             flag_intel_byterecl//&
-            flag_intel_standard_compliance//&
             flag_intel_backtrace
 
     case(id_intel_classic_mac)
@@ -428,7 +422,6 @@ subroutine get_debug_compile_flags(id, flags)
             flag_intel_limit//&
             flag_intel_debug//&
             flag_intel_byterecl//&
-            flag_intel_standard_compliance//&
             flag_intel_backtrace
     case(id_intel_classic_windows)
         flags = &
@@ -437,7 +430,6 @@ subroutine get_debug_compile_flags(id, flags)
             flag_intel_limit_win//&
             flag_intel_debug_win//&
             flag_intel_byterecl_win//&
-            flag_intel_standard_compliance_win//&
             flag_intel_backtrace_win
     case(id_intel_llvm_nix)
         flags = &
@@ -446,7 +438,6 @@ subroutine get_debug_compile_flags(id, flags)
             flag_intel_limit//&
             flag_intel_debug//&
             flag_intel_byterecl//&
-            flag_intel_standard_compliance//&
             flag_intel_backtrace
     case(id_intel_llvm_windows)
         flags = &
@@ -454,8 +445,7 @@ subroutine get_debug_compile_flags(id, flags)
             flag_intel_check_win//&
             flag_intel_limit_win//&
             flag_intel_debug_win//&
-            flag_intel_byterecl_win//&
-            flag_intel_standard_compliance_win
+            flag_intel_byterecl_win
     case(id_nag)
         flags = &
             flag_nag_debug//&
@@ -1075,13 +1065,26 @@ subroutine new_archiver(self, ar, echo, verbose)
       if (os_type /= OS_WINDOWS .and. os_type /= OS_UNKNOWN) then
         self%ar = "ar"//arflags
       else
+        ! Attempt "ar"
         call execute_command_line("ar --version > "//get_temp_filename()//" 2>&1", &
           & exitstat=estat)
-        if (estat /= 0) then
-          self%ar = "lib"//libflags
+          
+        if (estat == 0) then 
+            
+            self%ar = "ar"//arflags
+            
         else
-          self%ar = "ar"//arflags
-        end if
+            
+            ! Then "gcc-ar"
+            call execute_command_line("gcc-ar --version > "//get_temp_filename()//" 2>&1", &
+               & exitstat=estat)            
+            
+            if (estat /= 0) then
+              self%ar = "lib"//libflags
+            else
+              self%ar = "gcc-ar"//arflags
+            end if
+        endif
       end if
     end if
     self%use_response_file = os_type == OS_WINDOWS
